@@ -1,12 +1,9 @@
 import json
 import requests
-from pprint import pprint
-
-url_sms = '<please request>'
-url_validate = '<please request>'
 
 
 class SMSCuba:
+
     '''
     Sends messages (SMS) to Cuba and any other allowed country
 
@@ -19,12 +16,16 @@ class SMSCuba:
         and API, and send the message with the "send_message" function.
 
             $ sms_client = SMSCuba(<client_id>, <api_key>)
-            $ sms_client.send_message('+1234578900', 'Write whatever message you would like')
+            $ resp = sms_client.send_message('+1234578900', 'Write whatever message you would like')
+            $ print(resp)
     '''
 
     def __init__(self, client_id, api_key):
         self.client_id = client_id
         self.api_key = api_key
+        self.base_url = 'https://us-central1-sms-cuba.cloudfunctions.net'
+        self.url_sms = '{}/sms_request'.format(self.base_url)
+        self.url_validate = '{}/validate_client'.format(self.base_url)
 
         # Logs the client
         self.login_client()
@@ -44,7 +45,7 @@ class SMSCuba:
             'client_id': self.client_id,
             'api_key': self.api_key,
         }
-        response = requests.get(url_validate, params=params)
+        response = requests.get(self.url_validate, params=params)
         response_data = json.loads(response.content)
 
         if response_data['status'] != 'success':
@@ -68,6 +69,5 @@ class SMSCuba:
             'message': message
         }
 
-        response = requests.get(url_sms, params=params)
-        pprint(response.content)
+        response = requests.get(self.url_sms, params=params)
         return response.content
